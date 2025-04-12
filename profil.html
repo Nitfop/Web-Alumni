@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Alumni - Alumni SMK Mutiara Bangsa 1</title>
+    <link rel="icon" type="images/png" href="logo-sekolah.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1A237E;
+            --secondary: #FF6D00;
+            --dark-bg: #121212;
+            --dark-card: #1E1E1E;
+            --light-text: #FFFFFF;
+            --light-bg: #FFFFFF;
+            --light-card: #F5F5F5;
+            --dark-text: #121212;
+            --gray: #E0E0E0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+        }
+        
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-title {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .dark-mode .profile-title {
+            color: var(--secondary);
+        }
+        
+        .profiles-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-bottom: 100px; /* Added margin to create space above the menu */
+        }
+        
+        .profile-card {
+            width: 200px; /* Narrow width when not interacted */
+            height: 250px; /* Reduced height to maintain space with menu */
+            background-color: transparent; /* Transparent background when not interacted */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .profile-card.active {
+            width: 400px; /* Expanded width when interacted */
+            background-color: var(--light-card); /* White background when interacted */
+        }
+        
+        .profile-header {
+            position: relative;
+            height: 60%; /* Reduced height to maintain space with menu */
+            overflow: hidden;
+        }
+        
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-card:hover .profile-pic {
+            transform: scale(1.1); /* Scale effect on hover */
+        }
+        
+        .gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-card:hover .gradient-overlay {
+            opacity: 1; /* Show gradient on hover */
+        }
+        
+        .profile-info {
+            padding: 10px; /* Reduced padding */
+            text-align: center;
+            position: relative;
+            z-index: 1; /* Ensure text is above the gradient */
+        }
+        
+        .profile-name {
+            font-size: 1.5rem; /* Increased font size */
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            font-size: 1rem; /* Increased font size */
+            color: #666;
+        }
+        
+        .profile-details {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-card.active .profile-details {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+        
+        .profile-bio {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Dark Mode Styles */
+        .dark-mode .profile-card {
+            background-color: var(--dark-card);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .dark-mode .profile-name {
+            color: var(--secondary);
+        }
+        
+        .dark-mode .profile-role {
+            color: #999;
+        }
+        
+        .dark-mode .profile-bio {
+            color: var(--light-text);
+        }
+        
+        /* Menu and Light-Dark Switch Styles */
+        .floating-menu-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .floating-menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-card);
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            height: 50px;
+            width: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+        }
+        
+        .dark-mode .floating-menu {
+            background-color: var(--dark-card);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        .floating-menu.active {
+            width: 280px;
+            max-width: 90%;
+        }
+        
+        .menu-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .dark-mode .menu-icon {
+            color: var(--secondary);
+        }
+        
+        .floating-menu.active .menu-icon {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            padding: 0 15px;
+            margin: 0;
+            width: 100%;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .floating-menu.active .nav-list {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0 5px;
+        }
+        
+        .nav-link {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            position: relative;
+            padding: 15px 0;
+        }
+        
+        .dark-mode .nav-link {
+            color: var(--light-text);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link.active::after {
+            width: 20px;
+        }
+        
+        .nav-link.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .dark-mode .nav-link.active {
+            color: var(--secondary);
+        }
+        
+        /* Corner Hover Area for Dark Mode */
+        .corner-hover-area {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .corner-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light-card);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        .dark-mode .corner-indicator {
+            background-color: var(--dark-card);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .corner-hover-area:hover .corner-indicator {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .corner-indicator i {
+            font-size: 1rem;
+            color: var(--dark-text);
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .corner-indicator i {
+            color: var(--light-text);
+        }
+    </style>
+</head>
+<body>
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <h1 class="profile-title">Profil Alumni</h1>
+        
+        <div class="profiles-grid">
+            <!-- Profile 1 -->
+            <div class="profile-card" onclick="toggleProfile(this)">
+                <div class="profile-header">
+                    <img src="Alindo.png" alt="Alindo" class="profile-pic">
+                    <div class="gradient-overlay"></div>
+                </div>
+                <div class="profile-info">
+                    <h3 class="profile-name">Alindo</h3>
+                    <p class="profile-role">Siswa Kelas XII - Desain Komunikasi Visual</p>
+                </div>
+                <div class="profile-details">
+                    <p class="profile-bio">
+                        Alindo adalah siswa yang aktif di kelas dan selalu berusaha memberikan yang terbaik dalam setiap tugas.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Profile 2 -->
+            <div class="profile-card" onclick="toggleProfile(this)">
+                <div class="profile-header">
+                    <img src="Ryo.png" alt="Federico" class="profile-pic">
+                    <div class="gradient-overlay"></div>
+                </div>
+                <div class="profile-info">
+                    <h3 class="profile-name">Federico</h3>
+                    <p class="profile-role">Siswa Kelas XII - Desain Komunikasi Visual</p>
+                </div>
+                <div class="profile-details">
+                    <p class="profile-bio">
+                        Federico adalah siswa yang selalu siap membantu teman-temannya dalam belajar dan berbagi pengetahuan.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Profile 3 -->
+            <div class="profile-card" onclick="toggleProfile(this)">
+                <div class="profile-header">
+                    <img src="Nando.png" alt="Fernando" class="profile-pic">
+                    <div class="gradient-overlay"></div>
+                </div>
+                <div class="profile-info">
+                    <h3 class="profile-name">Fernando</h3>
+                    <p class="profile-role">Siswa Kelas XII - Desain Komunikasi Visual</p>
+                </div>
+                <div class="profile-details">
+                    <p class="profile-bio">
+                        Fernando adalah siswa yang selalu bersemangat dalam setiap kegiatan kelas dan aktif berpartisipasi.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Island Menu - Fixed -->
+    <div class="floating-menu-container">
+        <div class="floating-menu" id="floatingMenu">
+            <div class="menu-icon" id="menuIcon">
+                <i class="fas fa-user"></i>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html" class="nav-link" data-icon="home"><i class="fas fa-home"></i> Beranda</a></li>
+                <li class="nav-item"><a href="profil.html" class="nav-link active" data-icon="user"><i class="fas fa-user"></i> Profil</a></li>
+                <li class="nav-item"><a href="galeri.html" class="nav-link" data-icon="images"><i class="fas fa-images"></i> Galeri</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Corner Hover Area for Dark Mode Toggle -->
+    <div class="corner-hover-area" id="cornerHoverArea">
+        <div class="corner-indicator">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Profile Functionality
+        function toggleProfile(card) {
+            // Close all other profiles first
+            document.querySelectorAll('.profile-card').forEach(item => {
+                if (item !== card) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Toggle the clicked profile
+            card.classList.toggle('active');
+        }
+        
+        // Close profile when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.profile-card')) {
+                document.querySelectorAll('.profile-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+            }
+        });
+
+        // Light-Dark Mode Switch
+        const cornerHoverArea = document.getElementById('cornerHoverArea');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        // Check for saved theme preference
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme) {
+            body.classList.add(currentTheme);
+            updateThemeIcon();
+        }
+
+        // Theme Toggle on Corner Hover
+        cornerHoverArea.addEventListener('click', toggleTheme);
+        cornerHoverArea.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            toggleTheme();
+        });
+
+        function toggleTheme() {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark-mode': '');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // Menu Functionality
+        const floatingMenu = document.getElementById('floatingMenu');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const menuIcon = document.getElementById('menuIcon');
+
+        floatingMenu.addEventListener('click', handleMenuClick);
+        floatingMenu.addEventListener('touchend', handleMenuClick);
+
+        function handleMenuClick(e) {
+            if (e.target.classList.contains('menu-icon') || 
+                e.target.classList.contains('floating-menu') || 
+                e.target.tagName === 'I') {
+                floatingMenu.classList.toggle('active');
+            }
+        }
+
+        // Handle nav link clicks
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                updateMenuIcon(this.getAttribute('data-icon'));
+                floatingMenu.classList.remove('active');
+            });
+            
+            link.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                updateMenuIcon(this.getAttribute('data-icon'));
+                floatingMenu.classList.remove('active');
+            });
+        });
+
+        function updateMenuIcon(iconType) {
+            let iconClass;
+            switch(iconType) {
+                case 'home':
+                    iconClass = 'fa-home';
+                    break;
+                case 'user':
+                    iconClass = 'fa-user';
+                    break;
+                case 'images':
+                    iconClass = 'fa-images';
+                    break;
+                default:
+                    iconClass = 'fa-home';
+            }
+            menuIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!floatingMenu.contains(e.target)) {
+                floatingMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
